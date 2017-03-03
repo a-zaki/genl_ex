@@ -68,7 +68,7 @@ static int genl_test_rx_msg(struct sk_buff* skb, struct genl_info* info)
 		return -EINVAL;
 	}
 
-	printk(KERN_NOTICE "%d says %s \n", info->snd_portid, 
+	printk(KERN_NOTICE "%u says %s \n", info->snd_portid,
 		(char*)nla_data(info->attrs[GENL_TEST_ATTR_MSG]));
 	return 0;
 }
