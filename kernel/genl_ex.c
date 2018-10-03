@@ -50,7 +50,7 @@ nlmsg_fail:
 	return;
 }
 
-void genl_test_periodic(unsigned long data)
+void genl_test_periodic(struct timer_list *unused)
 {
 	greet_group(GENL_TEST_MCGRP0);
 	greet_group(GENL_TEST_MCGRP1);
@@ -110,11 +110,8 @@ static int __init genl_test_init(void)
 	if (rc)
 		goto failure;
 
-	init_timer(&timer);
-	timer.data = 0;
-	timer.function = genl_test_periodic;
-	timer.expires = jiffies + msecs_to_jiffies(GENL_TEST_HELLO_INTERVAL);
-	add_timer(&timer);
+	timer_setup(&timer, genl_test_periodic, 0);
+	mod_timer(&timer, jiffies + msecs_to_jiffies(GENL_TEST_HELLO_INTERVAL));	
 
 	return 0;
 
