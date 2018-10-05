@@ -12,7 +12,7 @@ CC=${CROSS_COMPILE}gcc
 all: genl_ex genl_ex.ko
 
 genl_ex: genl_ex.h genl_ex.c
-	$(CC) -Wextra -Wall -Werror -Wno-unused-parameter $(NL_LIB_FLAGS) $(NL_LIBS_L) $(NL_LIBS_l) genl_ex.c -o genl_ex
+	$(CC) -Wextra -Wall -Werror -Wno-unused-parameter genl_ex.c $(NL_LIB_FLAGS) $(NL_LIBS_L) $(NL_LIBS_l) -o genl_ex
 
 genl_ex.ko:
 	$(MAKE) -C $(shell pwd)/kernel KERNEL_DIR=$(KERNEL_DIR) 

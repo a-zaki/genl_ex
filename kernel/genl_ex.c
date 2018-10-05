@@ -50,7 +50,11 @@ nlmsg_fail:
 	return;
 }
 
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(4,14,0)
 void genl_test_periodic(unsigned long data)
+#else
+void genl_test_periodic(struct timer_list *unused)
+#endif
 {
 	greet_group(GENL_TEST_MCGRP0);
 	greet_group(GENL_TEST_MCGRP1);
@@ -110,11 +114,16 @@ static int __init genl_test_init(void)
 	if (rc)
 		goto failure;
 
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(4,14,0)
 	init_timer(&timer);
 	timer.data = 0;
 	timer.function = genl_test_periodic;
 	timer.expires = jiffies + msecs_to_jiffies(GENL_TEST_HELLO_INTERVAL);
 	add_timer(&timer);
+#else
+	timer_setup(&timer, genl_test_periodic, 0);
+	mod_timer(&timer, jiffies + msecs_to_jiffies(GENL_TEST_HELLO_INTERVAL));
+#endif
 
 	return 0;
 
