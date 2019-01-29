@@ -19,10 +19,6 @@ static void greet_group(unsigned int group)
 	char msg[GENL_TEST_ATTR_MSG_MAX];
 	struct sk_buff* skb = genlmsg_new(NLMSG_DEFAULT_SIZE, flags);
 
-	snprintf(msg, GENL_TEST_ATTR_MSG_MAX, "Hello group %s\n", 
-			genl_test_mcgrp_names[group]);
-	skb = genlmsg_new(NLMSG_DEFAULT_SIZE, flags);
-	
 	if (!skb) {
 		printk(KERN_ERR "%d: OOM!!", __LINE__);
 		return;
@@ -33,6 +29,9 @@ static void greet_group(unsigned int group)
 		printk(KERN_ERR "%d: Unknown err !", __LINE__);
 		goto nlmsg_fail;
 	}
+
+	snprintf(msg, GENL_TEST_ATTR_MSG_MAX, "Hello group %s\n",
+			genl_test_mcgrp_names[group]);
 
 	res = nla_put_string(skb, GENL_TEST_ATTR_MSG, msg);
 	if (res) {
