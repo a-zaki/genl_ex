@@ -176,14 +176,14 @@ static void prep_nl_sock(struct nl_sock** nlsock)
 	/* connect to genl */
 	if (genl_connect(*nlsock)) {
 		fprintf(stderr, "Unable to connect to genl!\n");
-		exit(EXIT_FAILURE);
+		goto exit_err;
 	}
 
 	/* resolve the generic nl family id*/
 	family_id = genl_ctrl_resolve(*nlsock, GENL_TEST_FAMILY_NAME);
 	if(family_id < 0){
 		fprintf(stderr, "Unable to resolve family name!\n");
-		exit(EXIT_FAILURE);
+		goto exit_err;
 	}
 
 	if (!mcgroups)
@@ -199,16 +199,22 @@ static void prep_nl_sock(struct nl_sock** nlsock)
 		if (grp_id < 0)	{
 			fprintf(stderr, "Unable to resolve group name for %u!\n",
 				(1 << bit));
-			exit(EXIT_FAILURE);
+            goto exit_err;
 		}
 		if (nl_socket_add_membership(*nlsock, grp_id)) {
 			fprintf(stderr, "Unable to join group %u!\n", 
 				(1 << bit));
-			exit(EXIT_FAILURE);
+            goto exit_err;
 		}
 next:
 		bit++;
 	}
+
+    return;
+
+exit_err:
+    nl_socket_free(*nlsock); // this call closes the socket as well
+    exit(EXIT_FAILURE);
 }
 
 int main(int argc, char** argv)
@@ -235,5 +241,6 @@ int main(int argc, char** argv)
 	} while (!ret);
 	
 	nl_cb_put(cb);
+    nl_socket_free(nlsock);
 	return 0;
 }
